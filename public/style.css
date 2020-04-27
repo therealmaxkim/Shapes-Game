@@ -1,3 +1,65 @@
 body {
     font-family: Futura;
+    background-color: lightgray;
+}
+
+#main {
+    display: flex;
+    justify-content: center;
+    border: 3px solid salmon;
+    padding: 10px;
+    margin: 10px;
+}
+.name {
+    display: flex;
+    justify-content: center;
+    color: blue;
+    font-size: 20px;
+}
+.horizontal {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    
+}
+.image {
+    margin: 20px;
+    padding: 10px;
+    border: 3px solid brown;
+}
+.description {
+    display: flex;
+    text-align: center;
+    border: 3px solid purple;
+    margin: 20px;
+    font-size: 20px;
+}
+.actions {
+    display: flex;
+    justify-content: space-between;
+}
+.left {
+    border: 3px dotted teal;
+    padding: 10px;
+}
+.up {
+    border: 3px dotted teal;
+    padding: 10px;
+}
+.right {
+    border: 3px dotted teal;
+    padding: 10px;
+}
+.go {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    border: 3px solid green;
+}
+.chosen {
+
+}
+.move {
+
 }

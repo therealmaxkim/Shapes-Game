@@ -1,0 +1,161 @@
+const p5 = require("p5");
+
+// Model URL
+// If you make your own model, this is where you'd link to it. This is a model
+// that I trained on making "heart hands", like this
+// https://image.shutterstock.com/image-photo/woman-making-heart-her-hands-600w-1211985307.jpg
+//const imageModelURL = 'https://teachablemachine.withgoogle.com/models/sltRChS8U/';
+
+const imageModelURL = 'https://teachablemachine.withgoogle.com/models/4O3iKtP_I/';
+
+// Whether or not you want to flip the video horizontally. If you trained your model
+// using your webcam, then you'll want to enable this
+const flipVideo = true;
+const width = 320;
+const height = 260;
+
+const attack_shape_draw = (p) => {
+    
+    let classifier;
+    let p5video;
+    let offscreenGraphics;
+    let label = "";
+
+	p.setup = () => {
+		p.createCanvas(width, height);
+		p.background(255);
+
+		p5video = p.createCapture(p.VIDEO);
+		p5video.size(width, height);
+        p5video.hide();
+
+        // We'll use this offscreen canvas to store the video, in case we
+        // want to transform it before classifying it
+        offscreenGraphics = p.createGraphics(width, height);
+        
+        classifier = ml5.imageClassifier(imageModelURL + 'model.json', classifyVideo);
+	}
+
+	p.draw = () => {
+        // This draws the video with X and Y flipped
+        offscreenGraphics.push();
+        if (flipVideo) {
+            offscreenGraphics.translate(width, 0);
+            offscreenGraphics.scale(-1, 1);
+        }
+        offscreenGraphics.image(p5video, 0, 0, width, height);
+        offscreenGraphics.pop();
+
+        p.image(offscreenGraphics, 0, 0, p.width, p.height);
+
+        // Draw the label
+        p.fill(255);
+        p.textSize(16);
+        p.textAlign(p.CENTER);
+        p.text(label, width / 2, height - 4);
+
+        //change the text to show what currently selected option is, on the page
+        window.document.getElementsByClassName('chosen')[0].innerHTML = label;
+        //select what endpoint will lead if you move 
+        var endpoint = window.document.getElementsByClassName(label)[0];
+        //change the endpoint on the anchor. Check that you found an element first
+        if (typeof endpoint !== 'undefined') {
+            var path = '/' + endpoint.textContent;
+            window.document.getElementsByClassName('move')[0].setAttribute("href", path);
+        }
+    }
+
+      // Get a prediction for the current video frame
+    function classifyVideo() {
+        classifier.classify(offscreenGraphics, gotResult);
+    }
+    
+    function gotResult(error, results) {
+        if (error) {
+            console.error(error);
+            return;
+        }
+
+        // results is an array, sorted by confidence. Each
+        // result will look like { label: "category label" confidence: 0.453 }
+        // or something like this
+        label = results[0].label;
+        classifyVideo();
+    }
+}
+
+const defense_shape_draw = (p) => {
+    
+    let classifier;
+    let p5video;
+    let offscreenGraphics;
+    let label = "";
+
+	p.setup = () => {
+		p.createCanvas(width, height);
+		p.background(255);
+
+		p5video = p.createCapture(p.VIDEO);
+		p5video.size(width, height);
+        p5video.hide();
+
+        // We'll use this offscreen canvas to store the video, in case we
+        // want to transform it before classifying it
+        offscreenGraphics = p.createGraphics(width, height);
+        
+        classifier = ml5.imageClassifier(imageModelURL + 'model.json', classifyVideo);
+	}
+
+	p.draw = () => {
+        // This draws the video with X and Y flipped
+        offscreenGraphics.push();
+        if (flipVideo) {
+            offscreenGraphics.translate(width, 0);
+            offscreenGraphics.scale(-1, 1);
+        }
+        offscreenGraphics.image(p5video, 0, 0, width, height);
+        offscreenGraphics.pop();
+
+        p.image(offscreenGraphics, 0, 0, p.width, p.height);
+
+        // Draw the label
+        p.fill(255);
+        p.textSize(16);
+        p.textAlign(p.CENTER);
+        p.text(label, width / 2, height - 4);
+
+        //change the text to show what currently selected option is, on the page
+        window.document.getElementsByClassName('chosen')[0].innerHTML = label;
+        //select what endpoint will lead if you move 
+        var endpoint = window.document.getElementsByClassName(label)[0];
+        //change the endpoint on the anchor. Check that you found an element first
+        if (typeof endpoint !== 'undefined') {
+            var path = '/' + endpoint.textContent;
+            window.document.getElementsByClassName('move')[0].setAttribute("href", path);
+        }
+    }
+
+      // Get a prediction for the current video frame
+    function classifyVideo() {
+        classifier.classify(offscreenGraphics, gotResult);
+    }
+    
+    function gotResult(error, results) {
+        if (error) {
+            console.error(error);
+            return;
+        }
+
+        // results is an array, sorted by confidence. Each
+        // result will look like { label: "category label" confidence: 0.453 }
+        // or something like this
+        label = results[0].label;
+        classifyVideo();
+    }
+}
+
+module.exports = function setup() {
+    const attack_p5 = new p5(attack_shape_draw, "attack_shape_draw");
+    const defense_p5 = new p5(defense_shape_draw, "defense_shape_draw");
+}
+
