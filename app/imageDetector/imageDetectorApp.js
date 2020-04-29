@@ -55,7 +55,7 @@ const attack_shape_draw = (p) => {
         p.text(label, width / 2, height - 4);
 
         //change the text to show what currently selected option is, on the page
-        window.document.getElementsByClassName('curr_attack')[0].innerHTML = label;
+        window.document.querySelector('.curr_attack').innerHTML = label;
 
     }
 
@@ -119,7 +119,7 @@ const defense_shape_draw = (p) => {
         p.text(label, width / 2, height - 4);
 
         //change the text to show what currently selected option is, on the page
-        window.document.getElementsByClassName('curr_defense')[0].innerHTML = label;
+        window.document.querySelector(".curr_defense").innerHTML = label;
     }
 
       // Get a prediction for the current video frame
