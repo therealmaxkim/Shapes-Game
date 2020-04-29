@@ -18,15 +18,18 @@
       </div>
 
       <div class="description">
-        <p>%description%</p>
+        <p>Select your attacking and defending shapes below.</p>
       </div>
 
       <div class="horizontal">
         <div id="attack_shape_draw"></div>
         <div class="go">
           <p>Your current chosen move is: </p>
-          <p class="chosen"></p>
-          <a class="move" href="">Click here to move</a>
+          <p class="curr_attack"></p>
+          <button onclick="setShape('curr_attack', 'chosen_attack')" >Confirm attack shape</button>
+        </div>
+        <div class="go">
+          <p class="chosen_attack"></p>
         </div>
       </div>
 
@@ -34,11 +37,19 @@
         <div id="defense_shape_draw"></div>
         <div class="go">
           <p>Your current chosen move is: </p>
-          <p class="chosen"></p>
-          <a class="move" href="">Click here to move</a>
+          <p class="curr_defense"></p>
+          <button onclick="setShape('curr_defense', 'chosen_defense')" >Confirm defense shape</button>
+        </div>
+        <div class="go">
+          <p class="chosen_defense"></p>
         </div>
       </div>
       
+      <div class="description">
+        <p>Click to confirm your move!</p>
+        <button>Enter</button>
+      </div>
+
       <!-- bundle all the scripts! thanks to webpack -->
       <script type="text/javascript" src="/bundle.js"></script>
   </body>

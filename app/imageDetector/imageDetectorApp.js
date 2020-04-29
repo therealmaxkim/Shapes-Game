@@ -55,14 +55,8 @@ const attack_shape_draw = (p) => {
         p.text(label, width / 2, height - 4);
 
         //change the text to show what currently selected option is, on the page
-        window.document.getElementsByClassName('chosen')[0].innerHTML = label;
-        //select what endpoint will lead if you move 
-        var endpoint = window.document.getElementsByClassName(label)[0];
-        //change the endpoint on the anchor. Check that you found an element first
-        if (typeof endpoint !== 'undefined') {
-            var path = '/' + endpoint.textContent;
-            window.document.getElementsByClassName('move')[0].setAttribute("href", path);
-        }
+        window.document.getElementsByClassName('curr_attack')[0].innerHTML = label;
+
     }
 
       // Get a prediction for the current video frame
@@ -125,14 +119,7 @@ const defense_shape_draw = (p) => {
         p.text(label, width / 2, height - 4);
 
         //change the text to show what currently selected option is, on the page
-        window.document.getElementsByClassName('chosen')[0].innerHTML = label;
-        //select what endpoint will lead if you move 
-        var endpoint = window.document.getElementsByClassName(label)[0];
-        //change the endpoint on the anchor. Check that you found an element first
-        if (typeof endpoint !== 'undefined') {
-            var path = '/' + endpoint.textContent;
-            window.document.getElementsByClassName('move')[0].setAttribute("href", path);
-        }
+        window.document.getElementsByClassName('curr_defense')[0].innerHTML = label;
     }
 
       // Get a prediction for the current video frame
