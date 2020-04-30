@@ -1,5 +1,5 @@
 // server.js
-
+// add api endpoint or ws to handle matchmaking, something like 'register'. hold on to one player until a pairing player is available.
 // init project
 const express = require('express');
 const app = express();

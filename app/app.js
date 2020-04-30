@@ -24,6 +24,8 @@ window.setShape = function(curr_shape, chosen_shape, btn_shape) {
 };
 
 
+//add function to move buttons around and adjusts text to reflect the state of the game
+
 //a function that checks that attack and defend shapes were confirmed, then sends the data
 //to the server 
 window.confirmMove = function() {
