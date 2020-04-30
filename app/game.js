@@ -41,7 +41,7 @@ module.exports = class Game extends EventEmitter {
     _updateHealth(incomingAttack){
         incomingAttack += Math.floor(incomingAttack*Math.random());
         const defense = this._player.currentDefense + Math.floor(this._player.currentDefense*Math.random());
-        this._player.hp = health -incomingAttack+defense;
+        this._player.health -= incomingAttack+defense;
         this.emit("playerHurt", this._player);
     }
     // Accessor for the player that this game owns, accessed like "game.ownedPlayer"
