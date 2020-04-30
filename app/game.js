@@ -30,17 +30,20 @@ module.exports = class Game extends EventEmitter {
     updateMoves(attack, defense){
         this._player.currentAttack = attack;
         this._player.currentDefense = defense;
+        this.emit("movesChanged", this._player);
     }
-    updateHealth(health, incomingAttack){
+
+    updateOpposingPlayer (player) {
+        this._opposingPlayer = player;
+        _updateHealth(this._opposingPlayer.currentAttack);
+    }
+    
+    _updateHealth(incomingAttack){
         incomingAttack += Math.floor(incomingAttack*Math.random());
         const defense = this._player.currentDefense + Math.floor(this._player.currentDefense*Math.random());
         this._player.hp = health -incomingAttack+defense;
         this.emit("playerHurt", this._player);
     }
-    updateOpposingPlayer (player) {
-        this._opposingPlayer = player;
-    }
-
     // Accessor for the player that this game owns, accessed like "game.ownedPlayer"
     get ownedPlayer() {
         return this._player;
