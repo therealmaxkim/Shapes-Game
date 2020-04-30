@@ -26,7 +26,7 @@
         <div class="go">
           <p>Your current chosen move is: </p>
           <p class="curr_attack"></p>
-          <button class="btn_attack" onclick="setShape('.curr_attack', '.chosen_attack', '.btn_attack')">Confirm attack shape</button>
+          <button class="btn_attack" onclick="confirmShape('.curr_attack', '.chosen_attack', '.btn_attack')">Confirm attack shape</button>
         </div>
         <div class="go">
           <p class="chosen_attack"></p>
@@ -38,7 +38,7 @@
         <div class="go">
           <p>Your current chosen move is: </p>
           <p class="curr_defense"></p>
-          <button class="btn_defense" onclick="setShape('.curr_defense', '.chosen_defense', '.btn_defense')">Confirm defense shape</button>
+          <button class="btn_defense" onclick="confirmShape('.curr_defense', '.chosen_defense', '.btn_defense')">Confirm defense shape</button>
         </div>
         <div class="go">
           <p class="chosen_defense"></p>
@@ -48,6 +48,7 @@
       <div class="description">
         <p>Click to confirm your move!</p>
         <button onclick="confirmMove()">Enter</button>
+        <button onclick="resetShape()">Reset</button>
       </div>
 
       <!-- bundle all the scripts! thanks to webpack -->

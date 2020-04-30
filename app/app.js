@@ -13,14 +13,14 @@ window.addEventListener("DOMContentLoaded", setup);
 //A function that confirms the shape. Takes 3 parameters: a period followed by the name of the class of the 
 //current shape class, the chosen shape class, and the button of the shape. 
 //Either attacking or defending shapes are being set. 
-window.setShape = function(curr_shape, chosen_shape, btn_shape) {
+window.confirmShape = function(curr_shape, chosen_shape, btn_shape) {
     //Set the current shape as the final shape selected
     var current_shape = window.document.querySelector(curr_shape).innerHTML;
     window.document.querySelector(chosen_shape).innerHTML = current_shape;
     
-    //Remove the confirming button so players can't modify their move
-    var elem = window.document.querySelector(btn_shape);
-    elem.parentNode.removeChild(elem);
+    //hide confirming button so players can't modify their move
+    var element = window.document.querySelector(btn_shape);
+    element.setAttribute("hidden", true)
 };
 
 
@@ -43,3 +43,12 @@ window.confirmMove = function() {
         this.alert("Please make sure to confirm both attack and defense shapes.")
     }
 };
+
+//a function that will make both the attack and defense confirm button appear
+window.resetShape = function() {
+    var attack_element = window.document.querySelector(".btn_attack");
+    var defense_element = window.document.querySelector(".btn_defense");
+
+    attack_element.removeAttribute("hidden");
+    defense_element.removeAttribute("hidden");
+}

@@ -8,42 +8,63 @@ module.exports = class Game extends EventEmitter {
 
         this._player = this._makePlayer(
             health, 
-            activityPoints, 
             attack, 
             defense,
+            attackShape,
+            defenseShape,
+            activityPoints, 
             side,
-            height);
+            height
+        );
 
         this._opposingPlayer = null;
     }
-    // Make a new player object out of hp, ap, and moves
-    _makePlayer(health, activityPoints, attack, defense, side, height) {
+
+    // Make a new player object 
+    _makePlayer(health, attack, attackShape, defense, defenseShape, activityPoints, side, height) {
         return {
             hp: health,
+            attack: attack,
+            defense: defense,
+            attackShape: attackShape,
+            defenseShape: defenseShape,
             ap: activityPoints,
-            currentAttack: attack,
-            currentDefense: defense,
             xPos: side,
             yPos: height,
         };
     }
-    updateMoves(attack, defense){
-        this._player.currentAttack = attack;
-        this._player.currentDefense = defense;
+
+    //update a player's move.
+    updateMoves(attack, attackShape, defense, defenseShape){
+        this._player.attack = attack;
+        this._player.attackShape = attackShape;
+        this._player.defense = defense;
+        this._player.defenseShape = defenseShape;
         this.emit("movesChanged", this._player);
     }
 
+    //updateOpposingPlayer should be called when we receive and emission from the 
+    //server telling us that the opposing player has confirmed their move
     updateOpposingPlayer (player) {
         this._opposingPlayer = player;
-        _updateHealth(this._opposingPlayer.currentAttack);
+        _updateHealth(this._opposingPlayer.attack, this._opposingPlayer.attackShape);
     }
     
-    _updateHealth(incomingAttack){
-        incomingAttack += Math.floor(incomingAttack*Math.random());
-        const defense = this._player.currentDefense + Math.floor(this._player.currentDefense*Math.random());
-        this._player.health -= incomingAttack+defense;
-        this.emit("playerHurt", this._player);
+    _updateHealth(incomingAttack, incomingAttackShape){
+        //calculate new value of incoming attack and new value of defending player
+        var attackValue = incomingAttack + Math.floor(incomingAttack*Math.random());
+        var defenseValue = this._player.defense + Math.floor(this._player.defense*Math.random());
+        
+        //Check if the player's defense shape matches the incoming attack shape.
+        //If the shapes match, then no damage is taken and attack is blocked.
+        if (incomingAttackShape !== this._player.defenseShape) {
+            this._player.health -= attackValue-defenseValue;
+            this.emit("playerHurt", this._player);
+        } else {
+            this.emit("playerBlocked", this._player);
+        }
     }
+
     // Accessor for the player that this game owns, accessed like "game.ownedPlayer"
     get ownedPlayer() {
         return this._player;
@@ -55,8 +76,8 @@ module.exports = class Game extends EventEmitter {
         p.strokeWeight(2);
         p.fill(255);
         p.textSize(16);
-        let myState = `My health: ${this._player.health} attack: ${this._player.currentAttack} defense: ${this._player.currentDefense}`;
-        let opposingState = `Opponent health: ${this._opposingPlayer.health} attack: ${this._opposingPlayer.currentAttack} defense: ${this._opposingPlayer.currentDefense}`;
+        let myState = `My health: ${this._player.health} attack: ${this._player.attack} attackShape: ${this._player.attackShape} defense: ${this._player.defense} defenseShape: ${this._player.defenseShape}`;
+        let opposingState = `Opponent health: ${this._opposingPlayer.health} attack: ${this._opposingPlayer.attack} attackShape: ${this._opposingPlayer.attackShape} defense: ${this._opposingPlayer.defense} defenseShape: ${this._opposingPlayer.defenseShape}`;
         p.text(myState, 10, height/2);
         p.text(opposingState, width-10, height/2);
         p.pop();
