@@ -8,18 +8,24 @@ module.exports = class GameClient extends EventEmitter {
         this._websocket = new WebSocket(pageUrl.toString());
 
         this._websocket.onopen = () => {
+            console.log("within gameclient onopen");
             this.emit("connected");
         };
 
         this._websocket.onmessage = (event) => {
-            const players = JSON.parse(event.data);
-            this.emit("playersUpdate", players);
+            console.log('within gameclient onmessage');
+            console.log(event.type);
+            console.log(event.data);
+            //const players = JSON.parse(event.data);
+            this.emit("playersUpdate", "players tesst");
         };
 
-        
+
     }
 
     sendPlayer(player) {
+        console.log("within sendplayer")
+        console.log(player)
         this._websocket.send(
             JSON.stringify(player)
         );

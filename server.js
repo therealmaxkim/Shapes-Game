@@ -20,19 +20,16 @@ if (process.env.NODE_ENV === "development") {
     publicPath: config.output.publicPath,
   }));
 }
-
-// http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
-
-// http://expressjs.com/en/starter/basic-routing.html
 app.get("/", function(request, response) {
   response.sendFile(__dirname + '/app/index.html');
 });
-
-// listen for requests :)
 const listener = app.listen(port, function () {
   console.log('Your app is listening on port ' + port);
 });
+
+
+
 
 // Space to store players, by player id
 const players = {};
@@ -62,6 +59,8 @@ wsServer.on("connection", (ws) => {
 
   // Update players whenever a new move gets made
   ws.on("message", (data) => {
+    console.log("message in server.js");
+    console.log(data);
     const player = JSON.parse(data);
     players[player.id] = player;
     playersByConnectionId[wsid] = player.id;

@@ -3,7 +3,7 @@ const { clamp }  = require("./util");
 const { v4: uuidv4 } = require("uuid");
 
 module.exports = class Game extends EventEmitter {
-    constructor(health, activityPoints, attack, defense, side) {
+    constructor (health, attack, defense, attackShape, defenseShape, activityPoints, side, height) {
         super();
 
         this._player = this._makePlayer(
@@ -18,10 +18,14 @@ module.exports = class Game extends EventEmitter {
         );
 
         this._opposingPlayer = null;
+
+        this._players = {
+            [this._player.id]: this._player
+        };
     }
 
     // Make a new player object 
-    _makePlayer(health, attack, attackShape, defense, defenseShape, activityPoints, side, height) {
+    _makePlayer (health, attack, attackShape, defense, defenseShape, activityPoints, side, height) {
         return {
             hp: health,
             attack: attack,
@@ -35,12 +39,13 @@ module.exports = class Game extends EventEmitter {
     }
 
     //update a player's move.
-    updateMoves(attack, attackShape, defense, defenseShape){
+    updateMoves (attack, attackShape, defense, defenseShape){
+        console.log("Within game updatemoves")
         this._player.attack = attack;
         this._player.attackShape = attackShape;
         this._player.defense = defense;
         this._player.defenseShape = defenseShape;
-        this.emit("movesChanged", this._player);
+        this.emit("playerMoveChange", this._player);
     }
 
     //updateOpposingPlayer should be called when we receive and emission from the 
@@ -50,7 +55,7 @@ module.exports = class Game extends EventEmitter {
         _updateHealth(this._opposingPlayer.attack, this._opposingPlayer.attackShape);
     }
     
-    _updateHealth(incomingAttack, incomingAttackShape){
+    updateHealth (incomingAttack, incomingAttackShape){
         //calculate new value of incoming attack and new value of defending player
         var attackValue = incomingAttack + Math.floor(incomingAttack*Math.random());
         var defenseValue = this._player.defense + Math.floor(this._player.defense*Math.random());
@@ -65,11 +70,9 @@ module.exports = class Game extends EventEmitter {
         }
     }
 
-    // Accessor for the player that this game owns, accessed like "game.ownedPlayer"
-    get ownedPlayer() {
-        return this._player;
-    }
+    //TODO: need a method to match players against each other and set the opposingPlayer
 
+    /*
     // Draw each player as a square at the appropriate position
     draw(p, width, height) {
         p.push();
@@ -81,6 +84,21 @@ module.exports = class Game extends EventEmitter {
         p.text(myState, 10, height/2);
         p.text(opposingState, width-10, height/2);
         p.pop();
+    }
+    */
+
+    // Accessor for the player that this game owns, accessed like "game.ownedPlayer"
+    getPlayer() {
+        return this._player;
+    }
+
+    updatePlayers(players) {
+        const ourPlayer = {
+            [this._player.id]: this._player
+        };
+
+        // Make sure that our player stays in there, no matter what
+        this._players = Object.assign(players, ourPlayer);
     }
 
     // _movePlayer(dx, dy) {
@@ -102,12 +120,4 @@ module.exports = class Game extends EventEmitter {
     //     }
     // }
 
-    // updatePlayers(players) {
-    //     const ourPlayer = {
-    //         [this._player.id]: this._player
-    //     };
-
-    //     // Make sure that our player stays in there, no matter what
-    //     this._players = Object.assign(players, ourPlayer);
-    // }
 }
