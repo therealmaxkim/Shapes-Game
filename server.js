@@ -20,16 +20,19 @@ if (process.env.NODE_ENV === "development") {
     publicPath: config.output.publicPath,
   }));
 }
+
+// http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
+
+// http://expressjs.com/en/starter/basic-routing.html
 app.get("/", function(request, response) {
   response.sendFile(__dirname + '/app/index.html');
 });
+
+// listen for requests :)
 const listener = app.listen(port, function () {
   console.log('Your app is listening on port ' + port);
 });
-
-
-
 
 // Space to store players, by player id
 const players = {};
@@ -48,30 +51,75 @@ function broadcastPlayers() {
   });
 }
 
+class Game {
+  constructor(player1, player2) {
+    this.player1 = player1;
+    this.player2 = player2;
+    this.move1;
+    this.move2;
+  }
+  setMove(player, move) {
+    if(player===player1){
+      this.move1=move;
+    }
+    else {
+      this.move2=move;
+    }
+  }
+  getOpponentMove(player){
+    if(player===player1){
+      return this.move2;
+    }
+    else {
+      return this.move1;
+    }
+  }
+
+}
+
+// map from WSUID -> Game
+const activeGames = {};
+
+const waitingPlayer = null;
+
 // Handle new connections
 wsServer.on("connection", (ws) => {
 
   // Generate a new UID for this websocket
-  const wsid = uuidv4();
+  const playerId = uuidv4();
+  const health = 10;
+  if (waitingPlayer === null) {
+    waitingPlayer = playerId;
+    ws.send("status", {message: "Waiting for another player to join"});
+  } else {
+    const game = new Game(waitingPlayer, playerId);
+    activeGames[waitingPlayer] = game;
+    activeGames[playerId] = game;
+    ws.send("foundOpponent", health);
+    waitingPlayer = null;
 
-  // First, send the connection the struct containing the players
-  ws.send(JSON.stringify(players));
+  }
 
   // Update players whenever a new move gets made
   ws.on("message", (data) => {
-    console.log("message in server.js");
-    console.log(data);
-    const player = JSON.parse(data);
-    players[player.id] = player;
-    playersByConnectionId[wsid] = player.id;
-    broadcastPlayers();
+    const game = activeGames[playerId];
+    const updateObject = JSON.parse(data);
+    
+    if (updateObject.type === "move") {
+      game.setMove(playerId, updateObject.move);
+    }
+
+    if (game.leftMove !== null && game.rightMove !== null) {
+      ws.send("movesConfirmed",{opponentMove: game.getOpponentMove(playerId)});    
+    }
   });
 
   // Clean up when the player disconnects
   ws.on("close", () => {
-    const playerid = playersByConnectionId[wsid];
-    if (playerid) delete players[playerid];
-    delete playersByConnectionId[wsid];
-    broadcastPlayers();
+    delete activeGames[waitingPlayer];
+    delete activeGames[playerId];
+    if (waitingPlayer) delete activeGames[waitingPlayer]
+
   });
+
 });
