@@ -1,23 +1,23 @@
 const p5 = require("p5");
-const Game = require("./game");
+const Player = require("./player");
 const GameClient = require("./gameClient");
 const setup = require("./imageDetector/imageDetectorApp");
 
+// let health = 10;
+let activityPoints = 4;
+let attackShape = "none";
+let defenseShape = "none";
 
 window.addEventListener('DOMContentLoaded', (event) => {
     setup();
     //health, attack, defense, attackShape, defenseShape, activityPoints, side, height
-    var game = new Game(3, 1, 1, 'None', 'None', 0, 0, 0);
+    let player = new Player(10, attackShape, defenseShape, activityPoints);
     let gameClient = new GameClient();
-
-    game.on("playerMoveChange", (player) => gameClient.sendPlayer(player));
-    game.on("playerHurt", (player) => gameClient.sendPlayer(player));
-    game.on("playerBlocked", (player) => gameClient.sendPlayer(player));
-
-
-    gameClient.on("playersUpdate", (players) => game.updatePlayers(players));
-    //gameClient.on("connected", () => gameClient.sendPlayer(game.getPlayer()));
-
+    player.on("movesChanged", (move) => gameClient.sendMove(move));
+    player.on()
+    gameClient.on("movesConfirmed", (move) => player.updateHealth(move));
+    gameClient.on("foundOpponent", (health) => player.setOpponentHealth(health));
+  
 
 
     //A function that confirms the shape. 
