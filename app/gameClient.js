@@ -17,17 +17,17 @@ module.exports = class GameClient extends EventEmitter {
             console.log(event.type);
             console.log(event.data);
             //const players = JSON.parse(event.data);
-            this.emit("playersUpdate", "players tesst");
+            this.emit("updatePlayer", player);
         };
 
 
     }
 
-    sendPlayer(player) {
+    sendMove(move) {
         console.log("within sendplayer")
-        console.log(player)
+        console.log(move);
         this._websocket.send(
-            JSON.stringify(player)
+            JSON.stringify(move)
         );
     }
 }
