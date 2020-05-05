@@ -14,8 +14,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     let player = new Player(10, attackShape, defenseShape, activityPoints);
     let gameClient = new GameClient();
     player.on("movesChanged", (move) => gameClient.sendMove(move));
-    player.on()
-    gameClient.on("movesConfirmed", (move) => player.updateHealth(move));
+    gameClient.on("movesConfirmed", (damage) => player.updateHealth(damage));
     gameClient.on("foundOpponent", (health) => player.setOpponentHealth(health));
   
 
