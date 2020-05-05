@@ -18,23 +18,21 @@ module.exports = class Player extends EventEmitter {
     _makePlayer(health, attackShape, defenseShape, activityPoints) {
         return {
             hp: health,
-            opponentHP,
-            move: {attackShape: attackShape,
-                    defenseShape: defenseShape},
+            opponentHP: health,
+            move:{  attackShape: attackShape,
+                    defenseShape: defenseShape,
+                    type: "move"
+                },
             ap: activityPoints,
         };
     }
-    _setOpponentHealth(health) {
-        this._player.opponentHP = health;
-        
-        }
         
     //update a player's move.
     updateMoves (attackShape, defenseShape){
         console.log("Within game updatemoves")
         //this._player.attack = attack;
-        this._player.move.attackShape = attackShape;
         //this._player.defense = defense;
+        this._player.move.attackShape = attackShape;
         this._player.move.defenseShape = defenseShape;
         this.emit("movesChanged", this._player.move);
     }
@@ -44,19 +42,14 @@ module.exports = class Player extends EventEmitter {
         //var attackValue = incomingAttack + Math.floor(incomingAttack*Math.random());
         //var defenseValue = this._player.defense + Math.floor(this._player.defense*Math.random());
         
-        //Check if the player's defense shape matches the incoming attack shape.
-        //If the shapes match, then no damage is taken and attack is blocked.
-        // if (this._player.defenseShape !== opponentMove.attackShape) {
-        //     this._player.health -= 1;
-        //     //the opponent's health is decreased 
-        // } 
-        // this.emit("playerHurt", this._player.hp);
         this._player.hp -= damage.myDamage;
-        this._setOpponentHealth(damage.opponentDamage);
-
+        this._player.opponentHP -= damage.opponentDamage;
     }
 
-
+    // Accessor for the player that this game owns, accessed like "game.ownedPlayer"
+    getPlayer() {
+        return this._player;
+    }
 
     //TODO: need a method to match players against each other and set the opposingPlayer
 
@@ -75,19 +68,14 @@ module.exports = class Player extends EventEmitter {
     }
     */
 
-    // Accessor for the player that this game owns, accessed like "game.ownedPlayer"
-    getPlayer() {
-        return this._player;
-    }
-
-    updatePlayers(players) {
-        const ourPlayer = {
-            [this._player.id]: this._player
-        };
+    //updatePlayers(players) {
+    //    const ourPlayer = {
+    //        [this._player.id]: this._player
+    //    };
 
         // Make sure that our player stays in there, no matter what
-        this._players = Object.assign(players, ourPlayer);
-    }
+    //    this._players = Object.assign(players, ourPlayer);
+    //}
 
     // _movePlayer(dx, dy) {
     //     this._player.x = clamp(this._player.x + dx, 0, this._columns - 1);

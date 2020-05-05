@@ -3,20 +3,50 @@ const Player = require("./player");
 const GameClient = require("./gameClient");
 const setup = require("./imageDetector/imageDetectorApp");
 
-// let health = 10;
+let health = 3;
 let activityPoints = 4;
 let attackShape = "none";
 let defenseShape = "none";
 
 window.addEventListener('DOMContentLoaded', (event) => {
+    //attach the teachable machines
     setup();
-    //health, attack, defense, attackShape, defenseShape, activityPoints, side, height
-    let player = new Player(10, attackShape, defenseShape, activityPoints);
+    //setup the player and game client
+    let player = new Player(health, attackShape, defenseShape, activityPoints);
     let gameClient = new GameClient();
+
     player.on("movesChanged", (move) => gameClient.sendMove(move));
-    gameClient.on("movesConfirmed", (damage) => player.updateHealth(damage));
-    gameClient.on("foundOpponent", (health) => player.setOpponentHealth(health));
+
+    gameClient.on("movesConfirmed", (data) => {
+        console.log("movesConfirmed of app.js", data)
+        player.updateHealth(data);
+        resetShape();
+        window.document.querySelector('.outcomeAttack').innerHTML = data.myAttackMessage;
+        window.document.querySelector('.outcomeDefense').innerHTML = data.myDefenseMessage;
+        if (player._player.hp == 0) {
+            window.document.querySelector('.yourHP').innerHTML = "You lost!";
+            window.document.querySelector('.opponentHP').innerHTML = "Opponent wins!";
+        } else if (player._player.opponentHP == 0) {
+            window.document.querySelector('.yourHP').innerHTML = "You win!";
+            window.document.querySelector('.opponentHP').innerHTML = "Opponent lost!";
+        } else {
+            window.document.querySelector('.yourHP').innerHTML = player._player.hp;
+            window.document.querySelector('.opponentHP').innerHTML = player._player.opponentHP;
+        }
+        window.document.querySelector('.description').innerHTML = "Make your next move!";
+    });
   
+    gameClient.on("waiting", (data) => {
+        console.log("waiting of app.js", data)
+        window.document.querySelector('.description').innerHTML = data.message;
+    });
+
+    gameClient.on("foundOpponent", (data) => {
+        console.log("foundOpponent of app.js", data)
+        window.document.querySelector('.description').innerHTML = data.message;
+        window.document.querySelector('.yourHP').innerHTML = player._player.hp;
+        window.document.querySelector('.opponentHP').innerHTML = player._player.opponentHP;
+    });
 
 
     //A function that confirms the shape. 
@@ -57,7 +87,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             
             //send the attack and defense to the server
             //attack, attackShape, defense, defenseShape
-            game.updateMoves(1, attack_shape, 1, defense_shape);
+            player.updateMoves(attack_shape, defense_shape);
 
         } else {
             this.alert("Please make sure to confirm both attack and defense shapes.");

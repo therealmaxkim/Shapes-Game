@@ -1,11 +1,9 @@
-// server.js
-// add api endpoint or ws to handle matchmaking, something like 'register'. hold on to one player until a pairing player is available.
-// init project
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 const WebSocket = require("ws");
 const { v4: uuidv4 } = require("uuid");
+
 
 // Special piece for running with webpack dev server
 if (process.env.NODE_ENV === "development") {
@@ -20,36 +18,19 @@ if (process.env.NODE_ENV === "development") {
     publicPath: config.output.publicPath,
   }));
 }
-
-// http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
-
-// http://expressjs.com/en/starter/basic-routing.html
 app.get("/", function(request, response) {
   response.sendFile(__dirname + '/app/index.html');
 });
-
-// listen for requests :)
 const listener = app.listen(port, function () {
   console.log('Your app is listening on port ' + port);
 });
 
-// Space to store players, by player id
-const players = {};
 
-// Map from a connection id, to the player id that the connection owns
-const playersByConnectionId = {};
+
 
 // Start a web socket server
 const wsServer = new WebSocket.Server({ server: listener });
-
-function broadcastPlayers() {
-  wsServer.clients.forEach(client => {
-    client.send(
-      JSON.stringify(players)
-    );
-  });
-}
 
 class Game {
   constructor(player1, player2) {
@@ -59,75 +40,129 @@ class Game {
     this.move2;
   }
   setMove(player, move) {
-    if(player===player1){
+    if(player===this.player1){
       this.move1=move;
-    }
-    else {
+    } else {
       this.move2=move;
     }
   }
-  getOpponentMove(player){
-    if(player===player1){
+  getOpponentMove(player) {
+    if(player===this.player1){
       return this.move2;
-    }
-    else {
+    } else {
       return this.move1;
     }
   }
-
+  resetMoves() {
+    this.move1 = undefined;
+    this.move2 = undefined;
+  }
 }
 
-// map from WSUID -> Game
+// map from player's WSUID -> Game
 const activeGames = {};
+// map from player's WSUID -> connection
+const connections = {};
+// variable to remember the opposing player
+var waitingPlayer = null;
 
-const waitingPlayer = null;
 
 // Handle new connections
 wsServer.on("connection", (ws) => {
+  console.log("new player connected");
 
   // Generate a new UID for this websocket
-  const playerId = uuidv4();
-  const health = 10;
+  const playerId = uuidv4(); 
+
+  //set the playerID with the ws object
+  connections[playerId] = ws;
+
+  //if you are waiting for a player, set yourself as the waiting player and send an update saying you are waiting
   if (waitingPlayer === null) {
     waitingPlayer = playerId;
-    ws.send("status", {message: "Waiting for another player to join"});
+    ws.send(JSON.stringify({type: "waiting", message: "Waiting for another player to join"}));
+  
+  //otherwise, you join another player. Create a new game and send an update that you found an opponent for both players.
   } else {
     const game = new Game(waitingPlayer, playerId);
     activeGames[waitingPlayer] = game;
     activeGames[playerId] = game;
-    ws.send("foundOpponent", health);
+    ws.send(JSON.stringify({type: "foundOpponent", message: "We found you an opponent! Make a move!"}));
+    connections[waitingPlayer].send(JSON.stringify({type: "foundOpponent", message: "We found you an opponent! Make a move!"}));
+    //reset the waiting player 
     waitingPlayer = null;
-
   }
 
-  // Update players whenever a new move gets made
+
+  // whenever a new move gets made
   ws.on("message", (data) => {
+    //grab the active game and parse info about the move
     const game = activeGames[playerId];
-    const updateObject = JSON.parse(data);
-    
-    if (updateObject.type === "move") {
-      game.setMove(playerId, updateObject.move);
-      if (game.getOpponentMove(playerId) !== null) {
-        const incomingAttack = game.getOpponentMove(playerId).attackShape;
-        const oppShield = game.getOpponentMove(playerId).defenseShape;
-        let damage = {myDamage: 0, opponentDamage: 0};
-        if(incomingAttack !=updateObject.move.defenseShape){
-          damage.myDamage=1;
+    const myMove = JSON.parse(data);
+
+    //check that we are making a move and that active game exists
+    if (myMove.type === "move" && game !== undefined) {
+
+      //send an update that you are waiting for opponent to make a move
+      ws.send(JSON.stringify({type: "waiting", message: "Waiting for your opponent to make a move..."}));
+      
+      //set this player's move in the game object
+      game.setMove(playerId, myMove);
+
+      //check that the opponent made a move
+      if (game.getOpponentMove(playerId) !== undefined) {
+
+        //grab the opponent's move
+        const opponentAttack = game.getOpponentMove(playerId).attackShape;
+        const opponentDefense = game.getOpponentMove(playerId).defenseShape;
+
+        //determine who is player1 and player 2
+        var player1 = playerId;
+        var player2 = game.player1 != playerId ? game.player1 : game.player2;
+
+
+        //default object we send to player1 and player2
+        var damage1 = {id: player1, myDamage: 0, opponentDamage: 0, myAttackMessage: "", myDefenseMessage: "", type: "movesConfirmed"};
+        var damage2 = {id: player2, myDamage: 0, opponentDamage: 0, myAttackMessage: "", myDefenseMessage: "", type: "movesConfirmed"};
+
+        //check if playerId took damage
+        if(opponentAttack != myMove.defenseShape){
+          damage1.myDamage = 1;
+          damage1.myDefenseMessage = "You took a hit from " + opponentAttack + "!";
+          damage2.opponentDamage = 1;
+          damage2.myAttackMessage = "You landed a hit with " + opponentAttack + "!";
+        } else {
+          damage1.myDefenseMessage = "You blocked a hit from " + opponentAttack + "!";
+          damage2.myAttackMessage = "Your attack was blocked with " + myMove.defenseShape +"!";
         }
-        if(oppShield != updateObject.move.attackShape) {
-          damage.opponentDamage = 1;
+
+        //check if I did damage to my opponent
+        if(opponentDefense != myMove.attackShape) {
+          damage1.opponentDamage = 1;
+          damage1.myAttackMessage = "You landed a hit with " + myMove.attackShape + "!";
+          damage2.myDamage = 1;
+          damage2.myDefenseMessage = 'You took a hit from ' + myMove.attackShape + "!";
+        } else {
+          damage1.myAttackMessage = "Your attack was blocked with " + opponentDefense + "!";
+          damage2.myDefenseMessage = 'You blocked a hit from ' + myMove.attackShape + "!";
         }
-        ws.send("movesConfirmed",damage);
+
+        //send the results of the moves to both players
+        connections[damage1.id].send(JSON.stringify(damage1));
+        connections[damage2.id].send(JSON.stringify(damage2));
+
+        //reset both player's moves
+        game.resetMoves();
       }    
     }
   });
 
+
   // Clean up when the player disconnects
   ws.on("close", () => {
-    delete activeGames[waitingPlayer];
-    delete activeGames[playerId];
-    if (waitingPlayer) delete activeGames[waitingPlayer]
-
+    if (playerId in activeGames) delete activeGames[playerId];
+    if (waitingPlayer && waitingPlayer in activeGames) delete activeGames[waitingPlayer];
+    delete connections[playerId];
   });
 
 });
