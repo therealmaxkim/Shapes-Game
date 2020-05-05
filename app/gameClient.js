@@ -17,7 +17,7 @@ module.exports = class GameClient extends EventEmitter {
             console.log(event.type);
             console.log(event.data);
             //const players = JSON.parse(event.data);
-            this.emit("updatePlayer", player);
+            this.emit("movesConfirmed", event.data);
         };
 
 
