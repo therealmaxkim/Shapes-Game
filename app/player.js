@@ -24,7 +24,7 @@ module.exports = class Player extends EventEmitter {
             ap: activityPoints,
         };
     }
-    setOpponentHealth(health) {
+    _setOpponentHealth(health) {
         this._player.opponentHP = health;
         
         }
@@ -39,19 +39,20 @@ module.exports = class Player extends EventEmitter {
         this.emit("movesChanged", this._player.move);
     }
 
-    updateHealth (opponentMove) {
+    updateHealth (damage) {
         //calculate new value of incoming attack and new value of defending player
         //var attackValue = incomingAttack + Math.floor(incomingAttack*Math.random());
         //var defenseValue = this._player.defense + Math.floor(this._player.defense*Math.random());
         
         //Check if the player's defense shape matches the incoming attack shape.
         //If the shapes match, then no damage is taken and attack is blocked.
-        if (this._player.defenseShape !== opponentMove.attackShape) {
-            this._player.health -= 1;
-            //the opponent's health is decreased 
-        } 
-        this.emit("playerHurt", this._player.hp);
-
+        // if (this._player.defenseShape !== opponentMove.attackShape) {
+        //     this._player.health -= 1;
+        //     //the opponent's health is decreased 
+        // } 
+        // this.emit("playerHurt", this._player.hp);
+        this._player.hp -= damage.myDamage;
+        this._setOpponentHealth(damage.opponentDamage);
 
     }
 
