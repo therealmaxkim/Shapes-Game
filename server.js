@@ -107,10 +107,18 @@ wsServer.on("connection", (ws) => {
     
     if (updateObject.type === "move") {
       game.setMove(playerId, updateObject.move);
-    }
-
-    if (game.leftMove !== null && game.rightMove !== null) {
-      ws.send("movesConfirmed",{opponentMove: game.getOpponentMove(playerId)});    
+      if (game.getOpponentMove(playerId) !== null) {
+        const incomingAttack = game.getOpponentMove(playerId).attackShape;
+        const oppShield = game.getOpponentMove(playerId).defenseShape;
+        let damage = {myDamage: 0, opponentDamage: 0};
+        if(incomingAttack !=updateObject.move.defenseShape){
+          damage.myDamage=1;
+        }
+        if(oppShield != updateObject.move.attackShape) {
+          damage.opponentDamage = 1;
+        }
+        ws.send("movesConfirmed",damage);
+      }    
     }
   });
 
