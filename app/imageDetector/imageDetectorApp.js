@@ -6,7 +6,7 @@ const p5 = require("p5");
 // https://image.shutterstock.com/image-photo/woman-making-heart-her-hands-600w-1211985307.jpg
 //const imageModelURL = 'https://teachablemachine.withgoogle.com/models/sltRChS8U/';
 
-const imageModelURL = 'https://teachablemachine.withgoogle.com/models/4O3iKtP_I/';
+const imageModelURL = 'https://teachablemachine.withgoogle.com/models/Sz72JYupP/';
 
 // Whether or not you want to flip the video horizontally. If you trained your model
 // using your webcam, then you'll want to enable this
