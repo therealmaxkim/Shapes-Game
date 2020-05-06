@@ -7,12 +7,23 @@ This game is a two-player multiplayer game where players choose two shapes: an "
 
 ### Motivation: 
 why did you choose this project, why is it important to you?
+The most important part of this project was the technical achievement of creating a "fighting game" server that matched players with an opponent and communicated with each player while also running a trained neural network in the user interface. It was a challenge to make it work and gain an understanding of all the working parts.
 
 ### Overview: 
 how does the project work, what processing steps does it go through?
+The server waits for pairs of players to connect and matches them on the fly. Each player can then lock in an attacking move and defense move as determined by a pose detection AI. The server checks whether a player guessed the opponent's attack shape, and assigns them damage otherwise. 
 
 ### Structural description: 
 what are the parts of the project, how do they communicate?
+
+Server: manage and track connections
+
+Application: track messages from server and game client. Provide feedback to user through text and P5 drawing
+
+Player script: track player statistics
+
+Game Client: relay messages to and from server
+
 
 ### In-depth dive: 
 for each part of the project, how does it work? What technologies did you use?
