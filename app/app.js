@@ -21,6 +21,8 @@ const sketch = (p) => {
     p.star = (x, y, radius1, radius2, npoints) => {
         let angle = p.TWO_PI / npoints;
         let halfAngle = angle / 2.0;
+        p.rotate(p.PI/4);
+        //p.noFill();
         p.beginShape();
         for (let a = 0; a < p.TWO_PI; a += angle) {
           let sx = x + p.cos(a) * radius2;
@@ -59,7 +61,7 @@ const sketch = (p) => {
 
 
         }
-        size+=15;
+        size+=25;
     }
 }
 
