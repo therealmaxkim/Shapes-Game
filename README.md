@@ -15,9 +15,13 @@ The server waits for pairs of players to connect and matches them on the fly. Ea
 
 ### Structural description: 
 what are the parts of the project, how do they communicate?
+
 Server: manage and track connections
+
 Application: track messages from server and game client. Provide feedback to user through text and P5 drawing
+
 Player script: track player statistics
+
 Game Client: relay messages to and from server
 
 
