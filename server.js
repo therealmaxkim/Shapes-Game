@@ -128,7 +128,7 @@ wsServer.on("connection", (ws) => {
         //check if playerId took damage
         if(opponentAttack != myMove.defenseShape){
           damage1.myDamage = 1;
-          damage1.myDefenseMessage = "You took a hit from " + opponentAttack + "!";
+          damage1.myDefenseMessage = "You took a hit from " + opponentAttack + "! You're seeing stars!";
           damage2.opponentDamage = 1;
           damage2.myAttackMessage = "You landed a hit with " + opponentAttack + "!";
         } else {
@@ -139,7 +139,7 @@ wsServer.on("connection", (ws) => {
         //check if I did damage to my opponent
         if(opponentDefense != myMove.attackShape) {
           damage1.opponentDamage = 1;
-          damage1.myAttackMessage = "You landed a hit with " + myMove.attackShape + "!";
+          damage1.myAttackMessage = "You landed a hit with " + myMove.attackShape + "! Your opponent is seeing stars!";
           damage2.myDamage = 1;
           damage2.myDefenseMessage = 'You took a hit from ' + myMove.attackShape + "!";
         } else {

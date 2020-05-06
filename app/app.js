@@ -7,6 +7,61 @@ let health = 3;
 let activityPoints = 4;
 let attackShape = "none";
 let defenseShape = "none";
+const width = window.document.querySelector('#visualization').clientWidth;
+const height = window.document.querySelector('#visualization').clientHeight;
+let size = 0;
+let myDamage = 0;
+let opponentDamage = 0;
+
+const sketch = (p) => {
+    p.setup = () => {
+        p.createCanvas(width, height);
+        p.background(0);
+    };
+    p.star = (x, y, radius1, radius2, npoints) => {
+        let angle = p.TWO_PI / npoints;
+        let halfAngle = angle / 2.0;
+        p.beginShape();
+        for (let a = 0; a < p.TWO_PI; a += angle) {
+          let sx = x + p.cos(a) * radius2;
+          let sy = y + p.sin(a) * radius2;
+          p.vertex(sx, sy);
+          sx = x + p.cos(a + halfAngle) * radius1;
+          sy = y + p.sin(a + halfAngle) * radius1;
+          p.vertex(sx, sy);
+        }
+        p.endShape(p.CLOSE);
+      };
+    p.draw = () => {
+        p.stroke(15);
+        p.background(240);
+        p.strokeWeight(0.5);
+        for ( var i = 0 ; i < 250 ; i++ ){
+            p.push();
+            p.translate(width*0.2, height*0.5);
+            if(myDamage>0){
+                p.star(0, 0, size/i, size/i*2, 5)
+            }
+            else{
+                p.star(0, 0, 5, 100, 4);
+            }
+            p.pop();
+
+            p.push();
+            p.translate(width*0.8, height*0.5);
+            if(opponentDamage>0){
+                p.star(0, 0, size/i, size/i*2, 5)
+            }
+            else{
+                p.star(0, 0, 5, 100, 4);
+            }
+            p.pop();
+
+
+        }
+        size+=15;
+    }
+}
 
 window.addEventListener('DOMContentLoaded', (event) => {
     //attach the teachable machines
@@ -16,10 +71,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
     let gameClient = new GameClient();
 
     player.on("movesChanged", (move) => gameClient.sendMove(move));
-
+    
     gameClient.on("movesConfirmed", (data) => {
+        size=1;
         console.log("movesConfirmed of app.js", data)
         player.updateHealth(data);
+        myDamage=data.myDamage;
+        opponentDamage=data.opponentDamage;
+
         resetShape();
         window.document.querySelector('.outcomeAttack').innerHTML = data.myAttackMessage;
         window.document.querySelector('.outcomeDefense').innerHTML = data.myDefenseMessage;
@@ -93,7 +152,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.alert("Please make sure to confirm both attack and defense shapes.");
         }
     };
-
+    
+    
     //a function that will make both the attack and defense confirm button appear
     function resetShape() {
         var attack_element = window.document.querySelector(".btn_attack");
@@ -120,9 +180,5 @@ window.addEventListener('DOMContentLoaded', (event) => {
     console.log("Made it to end of fucntion");
 }); 
 
-
-
-
-
-
+const myp5 = new p5(sketch, "visualization");
 

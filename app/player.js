@@ -53,21 +53,6 @@ module.exports = class Player extends EventEmitter {
 
     //TODO: need a method to match players against each other and set the opposingPlayer
 
-    /*
-    // Draw each player as a square at the appropriate position
-    draw(p, width, height) {
-        p.push();
-        p.strokeWeight(2);
-        p.fill(255);
-        p.textSize(16);
-        let myState = `My health: ${this._player.health} attack: ${this._player.attack} attackShape: ${this._player.attackShape} defense: ${this._player.defense} defenseShape: ${this._player.defenseShape}`;
-        let opposingState = `Opponent health: ${this._opposingPlayer.health} attack: ${this._opposingPlayer.attack} attackShape: ${this._opposingPlayer.attackShape} defense: ${this._opposingPlayer.defense} defenseShape: ${this._opposingPlayer.defenseShape}`;
-        p.text(myState, 10, height/2);
-        p.text(opposingState, width-10, height/2);
-        p.pop();
-    }
-    */
-
     //updatePlayers(players) {
     //    const ourPlayer = {
     //        [this._player.id]: this._player
